@@ -4,6 +4,7 @@ import PersonForm from './Components/PersonForm'
 import Persons from './Components/Persons'
 import axios from 'axios'
 import personService from './Services/persons'
+import Notification from './Components/Notification'
 
 const App = () => {
 
@@ -16,6 +17,8 @@ const App = () => {
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [search, setSearch] = useState('')
+  const [message, setMessage] = useState('default message')
+  const [messageStatus, setMessageStatus] = useState(null)
 
   useEffect(() => {
     // axios
@@ -41,7 +44,26 @@ const App = () => {
           personService.getAll().then(res => {
             setPersons(res)
           })
+            // .catch(e => {
+            //   alert(`The person ${newName} was deleted from server`)
+
+            // .catch(e => {
+            //   setErrorMessage(
+            //     `The person '${newName}' was already removed from server`
+            //   )
+            //   setTimeout(() => {
+            //     setErrorMessage(null)
+            //   }, 5000)
+            // })
         })
+        .catch(e => {
+        setMessage(`Information of ${newName} has already been removed from server`)
+        setMessageStatus('Error')
+  
+        setTimeout(() => {
+              setMessageStatus(null)
+            }, 5000)
+      })
       }
 
 
@@ -64,6 +86,13 @@ const App = () => {
       setPersons(persons.concat(res))
       setNewName('')
       setNewNumber('')
+
+      setMessage(`${newName} is added to the phonebook`)
+      setMessageStatus('Success')
+
+      setTimeout(() => {
+            setMessageStatus(null)
+          }, 5000)
     })
   }
 
@@ -71,10 +100,20 @@ const App = () => {
     // console.log(e.target.name);
     if (window.confirm(`Delete ${e.target.name} ?`)) {
       personService.delete(e.target.id).then(res => {
+        console.log(res);
         personService.getAll().then(res => {
           setPersons(res)
         })
       })
+      // .catch(e => {
+      //   console.log(111);
+      //   setMessage(`Information of ${newName} has already been removed from server`)
+      //   setMessageStatus('Error')
+  
+      //   setTimeout(() => {
+      //         setMessageStatus(null)
+      //       }, 5000)
+      // })
     }
 
   }
@@ -114,6 +153,7 @@ const App = () => {
     // </div>
     <div>
       <h2>Phonebook</h2>
+      {messageStatus && <Notification message={message} status={messageStatus}/>}
       <Filter value={search} onChange={handleChangeSearch} />
       <h3>Add a new</h3>
       <PersonForm
