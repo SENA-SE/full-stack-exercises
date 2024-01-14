@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import Filter from './Components/Filter'
 import PersonForm from './Components/PersonForm'
 import Persons from './Components/Persons'
-import axios from 'axios'
+// import axios from 'axios'
 import personService from './Services/persons'
 import Notification from './Components/Notification'
 
@@ -44,17 +44,7 @@ const App = () => {
           personService.getAll().then(res => {
             setPersons(res)
           })
-            // .catch(e => {
-            //   alert(`The person ${newName} was deleted from server`)
 
-            // .catch(e => {
-            //   setErrorMessage(
-            //     `The person '${newName}' was already removed from server`
-            //   )
-            //   setTimeout(() => {
-            //     setErrorMessage(null)
-            //   }, 5000)
-            // })
         })
         .catch(e => {
         setMessage(`Information of ${newName} has already been removed from server`)
@@ -70,17 +60,6 @@ const App = () => {
       return
     }
 
-    // const newPersons = [...persons, newPerson]
-    // setPersons(newPersons)
-
-    // axios
-    // .post('http://localhost:3001/persons', newPerson)
-    // .then(response => {
-    //   console.log(response)
-    //   setPersons(persons.concat(response.data))
-    //   setNewName('')
-    //   setNewNumber('')
-    // })
 
     personService.create(newPerson).then(res => {
       setPersons(persons.concat(res))
@@ -97,7 +76,7 @@ const App = () => {
   }
 
   const handleDelete = (e) => {
-    // console.log(e.target.name);
+
     if (window.confirm(`Delete ${e.target.name} ?`)) {
       personService.delete(e.target.id).then(res => {
         console.log(res);
@@ -105,15 +84,6 @@ const App = () => {
           setPersons(res)
         })
       })
-      // .catch(e => {
-      //   console.log(111);
-      //   setMessage(`Information of ${newName} has already been removed from server`)
-      //   setMessageStatus('Error')
-  
-      //   setTimeout(() => {
-      //         setMessageStatus(null)
-      //       }, 5000)
-      // })
     }
 
   }
@@ -130,27 +100,7 @@ const App = () => {
   const filteredPersons = persons.filter(person => person.name.toLowerCase().includes(search.toLowerCase())) || []
 
   return (
-    //   <div>
-    //   <h2>Phonebook</h2>
-    //   <div>
-    //       filter shown with<input value={search} onChange={handleChangeSearch} />
-    //   </div>
-    //   <h2>Add a New</h2>
-    //   <form onSubmit={addName}>
-    //     <div>
-    //       name: <input value={newName} onChange={handleChangeName} />
-    //     </div>
-    //     <div>number: <input value={newNumber} onChange={handleChangeNumber}/></div>
-    //     <div>
-    //       <button type="submit">add</button>
-    //     </div>
-    //   </form>
-    //   <h2>Numbers</h2>
-    //   {
-    //     filteredPersons.length > 0 ? filteredPersons.map(person => <p key={person.name}>{person.name} {person.number}</p>) :
-    //     persons.map(person => <p key={person.name}>{person.name} {person.number}</p>)
-    //   }
-    // </div>
+
     <div>
       <h2>Phonebook</h2>
       {messageStatus && <Notification message={message} status={messageStatus}/>}
