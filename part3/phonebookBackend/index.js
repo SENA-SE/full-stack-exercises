@@ -81,7 +81,7 @@ app.get('/api/persons/:id', (request, response) => {
 
 app.delete('/api/persons/:id', (request, response) => {
     const id = Number(request.params.id)
-    notes = notes.filter(note => note.id !== id)
+    persons = persons.filter(p => p.id !== id)
 
     response.status(204).end()
 })
@@ -99,11 +99,11 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    if (persons.some(p => p.name === body.name)) {
-        return response.status(400).json({
-            error: 'name must be unique'
-        })
-    }
+    // if (persons.some(p => p.name === body.name)) {
+    //     return response.status(400).json({
+    //         error: 'name must be unique'
+    //     })
+    // }
 
     const person = {
         name: body.name,
@@ -116,9 +116,37 @@ app.post('/api/persons', (request, response) => {
     response.json(person)
 })
 
+app.put('/api/persons/:id', (request, response) => {
+    const body = request.body
+    const id = Number(request.params.id)
+    console.log(body);
+    if (!body.name || !body.number) {
+        return response.status(400).json({
+            error: 'name or number is missing'
+        })
+    }
+
+    if (persons.find(p => p.id === id)) {
+        const person = {
+            name: body.name,
+            number: body.number,
+            id: id,
+        }
+
+        persons = persons.map(p => p.name === person.name ? person : p)
+        response.json(person)
+
+    } else {
+        return response.status(400).json({
+            error: `${body.name} has already been removed from phonebook`
+        })
+    }
+
+})
+
 
 const PORT = process.env.PORT || 3001
 console.log(process.env.PORT)
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
-  })
+})

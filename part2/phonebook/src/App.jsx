@@ -46,14 +46,16 @@ const App = () => {
           })
 
         })
-        .catch(e => {
-        setMessage(`Information of ${newName} has already been removed from server`)
-        setMessageStatus('Error')
-  
-        setTimeout(() => {
+          .catch(e => {
+            setMessage(e.response.data.error)
+            setMessageStatus('Error')
+            personService.getAll().then(res => {
+              setPersons(res)
+            })
+            setTimeout(() => {
               setMessageStatus(null)
             }, 5000)
-      })
+          })
       }
 
 
@@ -70,8 +72,15 @@ const App = () => {
       setMessageStatus('Success')
 
       setTimeout(() => {
-            setMessageStatus(null)
-          }, 5000)
+        setMessageStatus(null)
+      }, 5000)
+    }).catch(e => {
+      setMessage(e.response.data.error)
+      setMessageStatus('Error')
+
+      setTimeout(() => {
+        setMessageStatus(null)
+      }, 5000)
     })
   }
 
@@ -82,6 +91,20 @@ const App = () => {
         console.log(res);
         personService.getAll().then(res => {
           setPersons(res)
+
+          setMessage(`${e.target.name} is deleted from the phonebook`)
+          setMessageStatus('Success')
+    
+          setTimeout(() => {
+            setMessageStatus(null)
+          }, 5000)
+        }).catch(e => {
+          setMessage(e.response.data.error)
+          setMessageStatus('Error')
+    
+          setTimeout(() => {
+            setMessageStatus(null)
+          }, 5000)
         })
       })
     }
@@ -103,7 +126,7 @@ const App = () => {
 
     <div>
       <h2>Phonebook</h2>
-      {messageStatus && <Notification message={message} status={messageStatus}/>}
+      {messageStatus && <Notification message={message} status={messageStatus} />}
       <Filter value={search} onChange={handleChangeSearch} />
       <h3>Add a new</h3>
       <PersonForm
