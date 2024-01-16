@@ -30,8 +30,6 @@ if (process.argv.length == 3) {
         mongoose.connection.close()
     })
 } else {
-
-
     const name = process.argv[3]
     const number = process.argv[4]
     const person = new Person({
