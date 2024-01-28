@@ -10,9 +10,11 @@ const { favoriteBlog } = require("./utils/list_helper")
 const usersRouter = require('./controllers/users')
 const User = require('./models/user')
 const loginRouter = require('./controllers/login')
+const tokenExtractor = require('./middleware/tokenExtractor')
 
 app.use('/api/users', usersRouter)
 app.use('/api/login', loginRouter)
+app.use(tokenExtractor)
 
 app.get('/api/blogs', async (request, response) => {
   const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
@@ -20,23 +22,24 @@ app.get('/api/blogs', async (request, response) => {
   response.json(blogs).end()
 
 })
-const getTokenFrom = request => {
-  const authorization = request.get('authorization')
-  console.log(authorization)
-  if (authorization && authorization.startsWith('Bearer ')) {
-    return authorization.replace('Bearer ', '')
-  }
-  return null
-}
+// const getTokenFrom = request => {
+//   const authorization = request.get('authorization')
+//   console.log(authorization)
+//   if (authorization && authorization.startsWith('Bearer ')) {
+//     return authorization.replace('Bearer ', '')
+//   }
+//   return null
+// }
 
 app.post('/api/blogs', async (request, response) => {
   if (!request.body.title || !request.body.url) {
     return response.status(400).json({ error: 'title or url missing' })
   }
-  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
-  if (!decodedToken.id) {
-    return response.status(401).json({ error: 'token invalid' })
-  }
+  // const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+  // if (!decodedToken.id) {
+  //   return response.status(401).json({ error: 'token invalid' })
+  // }
+  const decodedToken = jwt.verify(request.token, process.env.SECRET)
   const user = await User.findById(decodedToken.id)
   // const user = await User.findById(request.body.userId)
   // console.log({...request.body, user: user.id})
@@ -49,10 +52,26 @@ app.post('/api/blogs', async (request, response) => {
 })
 
 app.delete('/api/blogs/:id', async (request, response) => {
-  await Blog.findByIdAndDelete(request.params.id)
-  response.status(204).end();
+  try {
+    const decodedToken = jwt.verify(request.token, process.env.SECRET)
+  } catch {
+    response.status(401).json({ error: 'token missing or invalid' })
+  }
 
-})
+
+  const blog = await Blog.findById(request.params.id);
+  if (!blog) {
+    return response.status(404).json({ error: 'blog not found' });
+  }
+
+  if (blog.user.toString() !== decodedToken.id.toString()) {
+    return response.status(401).json({ error: 'only the creator can delete a blog' });
+  }
+
+  await Blog.findByIdAndDelete(request.params.id);
+  response.status(204).end();
+});
+
 
 app.get('/api/favoriteBlog', async (request, response) => {
   Blog.find({}).then(blogs => {
