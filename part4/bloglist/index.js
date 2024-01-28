@@ -1,25 +1,49 @@
 const express = require('express')
 require('express-async-errors')
+const jwt = require('jsonwebtoken')
 const app = express()
 const cors = require('cors')
 app.use(cors())
 app.use(express.json())
 const Blog = require("./models/blog")
 const { favoriteBlog } = require("./utils/list_helper")
+const usersRouter = require('./controllers/users')
+const User = require('./models/user')
+const loginRouter = require('./controllers/login')
+
+app.use('/api/users', usersRouter)
+app.use('/api/login', loginRouter)
+
 app.get('/api/blogs', async (request, response) => {
-  const blogs = await Blog.find({})
+  const blogs = await Blog.find({}).populate('user', { username: 1, name: 1 })
 
   response.json(blogs).end()
 
 })
+const getTokenFrom = request => {
+  const authorization = request.get('authorization')
+  console.log(authorization)
+  if (authorization && authorization.startsWith('Bearer ')) {
+    return authorization.replace('Bearer ', '')
+  }
+  return null
+}
 
 app.post('/api/blogs', async (request, response) => {
   if (!request.body.title || !request.body.url) {
     return response.status(400).json({ error: 'title or url missing' })
   }
-
-  const blog = new Blog(request.body)
+  const decodedToken = jwt.verify(getTokenFrom(request), process.env.SECRET)
+  if (!decodedToken.id) {
+    return response.status(401).json({ error: 'token invalid' })
+  }
+  const user = await User.findById(decodedToken.id)
+  // const user = await User.findById(request.body.userId)
+  // console.log({...request.body, user: user.id})
+  const blog = new Blog({...request.body, user: user.id})
   const result = await blog.save()
+  user.blogs = user.blogs.concat(result.id)
+  await user.save()
   response.status(201).json(result).end()
 
 })
