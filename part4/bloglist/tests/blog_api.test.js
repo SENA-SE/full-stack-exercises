@@ -55,20 +55,39 @@ const initialBlogs = [
     }
 ]
 
-// PROBLEM: When using forEach to run asynchronous operations, it doesn't await for all operations to finish before moving to the next test. 
-// beforeEach(async() => {
-//     await Blog.deleteMany({})
-//     initialBlogs.forEach(async (blog)=> {
-//         await blog.save() 
-//     })
-// })
+const loginUserAndGetToken = async () => {
+    const loginResponse = await supertest(app)
+        .post('/api/login')
+        .send({ username: 'newuser', password: 'newuser2024' });
+
+    return loginResponse.body.token;
+}
 
 beforeEach(async () => {
-    await Blog.deleteMany({})
-    const blogObjs = initialBlogs.map(blog => new Blog(blog))
-    const promiseArr = blogObjs.map(blog => blog.save())
-    await Promise.all(promiseArr)
-})
+    const newUser = {
+        username: 'newuser',
+        name: 'newuser',
+        password: 'newuser2024',
+    };
+
+    await supertest(app)
+        .post('/api/users')
+        .send(newUser);
+
+    const token = await loginUserAndGetToken()
+
+
+    await Blog.deleteMany({});
+
+
+    for (const blog of initialBlogs) {
+        await supertest(app)
+            .post('/api/blogs')
+            .set('Authorization', `Bearer ${token}`)
+            .send(blog);
+    }
+});
+
 
 test('blogs are returned as correct number of json', async () => {
     const response = await supertest(app).get('/api/blogs')
@@ -85,6 +104,7 @@ test('unique identifier property of blog post is named id', async () => {
 });
 
 test('add a valid blog', async () => {
+    const token = await loginUserAndGetToken()
     const newBlog = {
         title: 'Add a New Blog',
         author: 'author',
@@ -97,6 +117,7 @@ test('add a valid blog', async () => {
 
     await supertest(app)
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/);
@@ -111,6 +132,8 @@ test('add a valid blog', async () => {
 })
 
 test('missing likes property', async () => {
+    const token = await loginUserAndGetToken()
+
     const newBlog = {
         title: 'Blog Without Likes',
         author: 'author',
@@ -119,6 +142,7 @@ test('missing likes property', async () => {
 
     const response = await supertest(app)
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(201)
         .expect('Content-Type', /application\/json/);
@@ -128,6 +152,7 @@ test('missing likes property', async () => {
 });
 
 test('blog without title will not be added', async () => {
+    const token = await loginUserAndGetToken()
     const newBlog = {
         author: 'author',
         url: 'http://test.com',
@@ -136,11 +161,13 @@ test('blog without title will not be added', async () => {
 
     await supertest(app)
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(400);
 });
 
 test('blog without url will not be added', async () => {
+    const token = await loginUserAndGetToken()
     const newBlog = {
         title: 'Blog Without URL',
         author: 'Test Author',
@@ -149,54 +176,81 @@ test('blog without url will not be added', async () => {
 
     await supertest(app)
         .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
         .send(newBlog)
         .expect(400);
 })
 
 test('delete a blog', async () => {
+    const token = await loginUserAndGetToken()
+
     const newBlog = {
-      title: 'Blog to be deleted',
-      author: 'author',
-      url: 'http://test.com'
+        title: 'Blog to be deleted',
+        author: 'author',
+        url: 'http://test.com'
     };
-  
+
     const createdBlog = await supertest(app)
-      .post('/api/blogs')
-      .send(newBlog)
-      .expect(201)
-      .expect('Content-Type', /application\/json/);
-  
+        .post('/api/blogs')
+        .set('Authorization', `Bearer ${token}`)
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/);
+
     const initialBlogs = await supertest(app).get('/api/blogs');
     const initialCount = initialBlogs.body.length;
-  
+
     await supertest(app)
-      .delete(`/api/blogs/${createdBlog.body.id}`)
-      .expect(204);
-  
+        .delete(`/api/blogs/${createdBlog.body.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .expect(204);
+
     const finalBlogs = await supertest(app).get('/api/blogs');
     expect(finalBlogs.body.length).toBe(initialCount - 1);
-  })
+})
 
-  test('update blog likes', async () => {
+test('update blog likes', async () => {
+    const loginResponse = await supertest(app)
+        .post('/api/login')
+        .send({ username: 'newuser', password: 'newuser2024' });
+
+    const token = loginResponse.body.token
     const initialBlogs = await supertest(app).get('/api/blogs');
     const blogToUpdate = initialBlogs.body[0];
-  
+
     const updatedBlog = {
-      ...blogToUpdate,
-      likes: blogToUpdate.likes + 1
+        ...blogToUpdate,
+        likes: blogToUpdate.likes + 1
     }
-  
+
     await supertest(app)
-      .put(`/api/blogs/${blogToUpdate.id}`)
-      .send(updatedBlog)
-      .expect(200)
-      .expect('Content-Type', /application\/json/);
-  
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .set('Authorization', `Bearer ${token}`)
+        .send(updatedBlog)
+        .expect(200)
+        .expect('Content-Type', /application\/json/);
+
     const finalBlogs = await supertest(app).get('/api/blogs');
     const updated = finalBlogs.body.find(b => b.id === blogToUpdate.id);
-  
+
     expect(updated.likes).toBe(blogToUpdate.likes + 1);
-  })
+})
+
+test('add a blog without a token', async () => {
+    const newBlog = {
+        title: 'Unauthorized Blog',
+        author: 'Test Author',
+        url: 'http://unauthorizedblog.com',
+        likes: 1
+    };
+
+    await supertest(app)
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(401)
+        .expect('Content-Type', /application\/json/);
+});
+
 
 afterAll(async () => {
     await mongoose.connection.close()
