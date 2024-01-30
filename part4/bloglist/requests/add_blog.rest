@@ -3,10 +3,10 @@ GET http://localhost:3003/api/blogs/
 ###
 POST http://localhost:3003/api/blogs/ HTTP/1.1
 content-type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpZCI6IjY1YjZlZDE4ZmYwMmNiMjNjZmEwZTQxNyIsImlhdCI6MTcwNjQ4NzA3MCwiZXhwIjoxNzA2NDkwNjcwfQ.aQ-EoatF1h3z4Z30EbNi9uK-_MRVojPMnNQJeYK5iOE
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InVzZXIiLCJpZCI6IjY1YjkyYWZiMjE4MjNkMDNlNTk4M2M4YyIsImlhdCI6MTcwNjYzNTU5NiwiZXhwIjoxNzA2NjM5MTk2fQ.NlN5VXI6LQscrqDappXWiqqBN1NRwzUseBZiYvBHYEs
 
 {
-    "title": "sample-title",
+    "title": "test",
     "author": "sample-author",
     "url": "sample-url",
     "likes": 10,
