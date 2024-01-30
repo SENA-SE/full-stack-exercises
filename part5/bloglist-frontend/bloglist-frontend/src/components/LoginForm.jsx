@@ -5,7 +5,7 @@ const LoginForm = ({
   username,
   password,
   errorMessage
- }) => (
+}) => (
   <form onSubmit={handleLogin}>
     <h1>Log in to application</h1>
     {errorMessage && <div>{errorMessage}</div>}

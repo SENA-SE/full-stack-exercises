@@ -1,5 +1,5 @@
-import Togglable from "./Togglable"
-import blogService from "../services/blogs"
+import Togglable from './Togglable'
+import blogService from '../services/blogs'
 const Blog = ({ blog, setBlogs }) => {
   const blogStyle = {
     paddingTop: 10,
