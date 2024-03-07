@@ -13,6 +13,7 @@ const CreateForm = ({ handleSubmitBlog, handleTitleChange, handleAuthorChange, h
           type="text"
           value={title}
           name="title"
+          placeholder="please write your title here"
           onChange={({ target }) => handleTitleChange(target.value)}
         />
       </div>
@@ -22,7 +23,8 @@ const CreateForm = ({ handleSubmitBlog, handleTitleChange, handleAuthorChange, h
         <input
           type="text"
           value={author}
-          name="title"
+          name="author"
+          placeholder="please write the author here"
           onChange={({ target }) => handleAuthorChange(target.value)}
         />
       </div>
@@ -32,11 +34,12 @@ const CreateForm = ({ handleSubmitBlog, handleTitleChange, handleAuthorChange, h
         <input
           type="text"
           value={url}
-          name="title"
+          name="url"
+          placeholder="please write the url here"
           onChange={({ target }) => handleUrlChange(target.value)}
         />
       </div>
-      <button type="submit">Submit</button>
+      <button type="submit" id='submit-blog'>Submit</button>
 
     </form>
   </div>

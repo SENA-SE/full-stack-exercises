@@ -8,7 +8,7 @@ const LoginForm = ({
 }) => (
   <form onSubmit={handleLogin}>
     <h1>Log in to application</h1>
-    {errorMessage && <div>{errorMessage}</div>}
+    {errorMessage && <div className="message">{errorMessage}</div>}
     <div>
       username
       <input
@@ -27,7 +27,7 @@ const LoginForm = ({
         onChange={({ target }) => handlePasswordChange(target.value)}
       />
     </div>
-    <button type="submit">login</button>
+    <button type="submit" id="login-button">login</button>
   </form>
 )
 
