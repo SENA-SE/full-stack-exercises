@@ -14,7 +14,7 @@ const notificationSlice = createSlice({
 })
 
 export const { addNotification, clearNotification } = notificationSlice.actions;
-export const popNotification = (content, clearTime) => {
+export const setNotification = (content, clearTime) => {
     return async(dispatch) => {
         clearTimeout(window.clearTimeout)
         dispatch(addNotification(content))
