@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useDispatch, useSelector } from "react-redux";
-import { voteAnecdote } from "../reducers/anecdoteReducer";
+import { addVote, voteAnecdote } from "../reducers/anecdoteReducer";
 import { popNotification } from "../reducers/notificationReducer";
 
 const Anecdote = ({ anecdote, handleVote }) => (
@@ -9,8 +9,8 @@ const Anecdote = ({ anecdote, handleVote }) => (
       {anecdote.content}
     </div>
     <div>
-      has {anecdote.votes}
-      <button type="button" onClick={() => handleVote(anecdote.id)}>vote</button>
+      has {anecdote.votes} votes 
+      <button type="button" onClick={() => handleVote(anecdote.id)}>vote for it</button>
     </div>
   </div>
 )
@@ -18,14 +18,13 @@ const Anecdote = ({ anecdote, handleVote }) => (
 const AnecdoteList= () => {
   const anecdotesList = useSelector(({ anecdotes, filter }) => 
     anecdotes.filter((anecdote) => {
-      console.log(filter)
       return anecdote.content.toLowerCase().includes(filter.toLowerCase())
     }
   ))
   const dispatch = useDispatch();
 
   const vote = (anecdote) => {
-    dispatch(voteAnecdote(anecdote));
+    dispatch(addVote(anecdote));
     dispatch(popNotification(`You voted for ${anecdote.content}`, 3))
   };
 
