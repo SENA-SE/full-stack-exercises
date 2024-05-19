@@ -93,7 +93,7 @@ let books = [
 const typeDefs = `
   type Book {
     title: String!
-    published: Int!
+    published: String!
     author: String!
     id: ID!
     genres: [String!]!
@@ -102,7 +102,7 @@ const typeDefs = `
   type Author {
     name: String!
     id: ID!
-    born: Int
+    born: String
     bookCount: Int
   }
 
@@ -118,14 +118,14 @@ const typeDefs = `
     addBook(
       title: String!
       author: String!
-      published: Int!
+      published: String!
       genres: [String!]!
       ): Book
 
-    eidtAuthor(
+    editAuthor(
       name: String!
-      setBornTo: Int!
-    ): Author
+      setBornTo: String!
+      ): Author
 
   }
 `
@@ -175,6 +175,7 @@ const resolvers = {
       const updatedAuthor = { ...author, born: args.setBornTo }
       authors = authors.map(author => author.name === args.name ? updatedAuthor : author)
       return updatedAuthor
+      
     }
   }
 }
