@@ -5,38 +5,40 @@ import NewBook from "./components/NewBook";
 import {useQuery} from '@apollo/client';
 
 import {ALL_AUTHORS, ALL_BOOKS} from './queries';
+import Notification from "./components/Notification";
 
 const App = () => {
   const authors = useQuery(ALL_AUTHORS);
   const books = useQuery(ALL_BOOKS);
 
   const [page, setPage] = useState("authors");
-  const [error, setError] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
 
   if (authors.loading || books.loading) {
     return <div>Loading...</div>;
   }
 
-  const notification = (message) => { 
-    setError(message);
+  const setNotification = (message) => { 
+    setErrorMsg(message);
     setTimeout(() => {
-      setError(null);
+      setErrorMsg(null);
     }, 10000);
   }
 
   return (
     <div>
+      <Notification message={errorMsg} />
       <div>
         <button onClick={() => setPage("authors")}>authors</button>
         <button onClick={() => setPage("books")}>books</button>
         <button onClick={() => setPage("add")}>add book</button>
       </div>
 
-      <Authors show={page === "authors"} authors={authors.data.allAuthors} />
+      <Authors show={page === "authors"} authors={authors.data.allAuthors} setError={setNotification}/>
 
       <Books show={page === "books"} books={books.data.allBooks}/>
 
-      <NewBook show={page === "add"} setError={notification}/>
+      <NewBook show={page === "add"} setError={setNotification}/>
     </div>
   );
 };

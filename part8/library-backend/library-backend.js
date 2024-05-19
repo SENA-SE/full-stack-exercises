@@ -124,7 +124,7 @@ const typeDefs = `
 
     editAuthor(
       name: String!
-      setBornTo: String!
+      born: String!
       ): Author
 
   }
@@ -172,7 +172,7 @@ const resolvers = {
       if (!author) {
         return null
       }
-      const updatedAuthor = { ...author, born: args.setBornTo }
+      const updatedAuthor = { ...author, born: args.born }
       authors = authors.map(author => author.name === args.name ? updatedAuthor : author)
       return updatedAuthor
       
