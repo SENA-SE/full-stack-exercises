@@ -12,3 +12,11 @@ export interface Patient {
     occupation: string;
     ssn: string;
 }
+
+export interface PatientWithoutSSN {
+    id: string;
+    name: string;
+    dateOfBirth: string;
+    gender: string;
+    occupation: string;
+}
