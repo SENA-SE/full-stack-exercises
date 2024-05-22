@@ -1,14 +1,19 @@
 /* eslint-disable react/prop-types */
+import { useState } from "react"
 const Books = (props) => {
+
+  const [genre, setGenre] = useState(null)
+  const genres = props.books.map((book) => book.genres).flat()
+  
   if (!props.show) {
     return null
   }
 
-
+  const filteredBooks = genre ? props.books.filter((book) => book.genres.includes(genre)) : props.books
   return (
     <div>
       <h2>books</h2>
-
+      <p>in genre <strong>{genre}</strong></p>
       <table>
         <tbody>
           <tr>
@@ -16,15 +21,23 @@ const Books = (props) => {
             <th>author</th>
             <th>published</th>
           </tr>
-          {props.books.map((a) => (
-            <tr key={a.title}>
-              <td>{a.title}</td>
-              <td>{a.author}</td>
-              <td>{a.published}</td>
+          {filteredBooks.map((book) => (
+            <tr key={book.title}>
+              <td>{book.title}</td>
+              <td>{book.author.name}</td>
+              <td>{book.published}</td>
             </tr>
           ))}
         </tbody>
       </table>
+      <div>
+        {genres.map((genre) => (
+          <button key={genre} onClick={() => setGenre(genre)}>
+            {genre}
+          </button>
+        ))}  
+        
+      </div>
     </div>
   )
 }
