@@ -3,8 +3,8 @@ import { useState } from "react"
 const Books = (props) => {
 
   const [genre, setGenre] = useState(null)
-  const genres = props.books.map((book) => book.genres).flat()
-  
+  let genres = props.books.map((book) => book.genres).flat()
+  genres = [...new Set(genres)]
   if (!props.show) {
     return null
   }
