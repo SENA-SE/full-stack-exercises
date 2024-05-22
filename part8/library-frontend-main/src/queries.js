@@ -70,3 +70,20 @@ export const USER = gql`
     }
   }
 `;
+
+export const NEW_BOOK = gql`
+  subscription {
+    newBook {
+      title
+      author{
+        name
+        born
+        bookCount
+        id
+      }
+      published
+      genres
+      id
+    }
+  }
+`;

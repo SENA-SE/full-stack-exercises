@@ -1,6 +1,8 @@
 require('dotenv').config()
 const { ApolloServer } = require('@apollo/server')
 const { startStandaloneServer } = require('@apollo/server/standalone')
+const {PubSub} = require('graphql-subscriptions')
+
 const { v1: uuid } = require('uuid')
 const jwt = require('jsonwebtoken')
 const Author = require('./models/author')
@@ -19,6 +21,8 @@ moongoose.connect(MONGODB_URI).then(() => {
 .catch((error) => {
   console.log(error.message)
 })
+
+const pubsub = new PubSub()
 
 // let authors = [
 //   {
@@ -176,7 +180,7 @@ const resolvers = {
     },
     
     allAuthors: async () => {
-      return await Author.find({})
+      return await Author.find({}).populates('books')
     },
     allBooks: async (root, args) => {
       const resultAuthor = await Author.findOne({ name: args.author })
@@ -195,8 +199,8 @@ const resolvers = {
   Author: {
     bookCount: async (root) => {
       const resultAuthor = await Author.findOne({ name: root.name })
-      const resultBook = await Book.find({ author: resultAuthor.id })
-      return resultBook.length
+      const resultBooks = await Book.find({ author: resultAuthor.id })
+      return resultBooks.length
     }
   },
   me: async (root, args, context) => {
@@ -221,10 +225,14 @@ const resolvers = {
       const book = new Book({ ...args, resultAuthor })
       try {
         await book.save()
-        return book
+        resultAuthor.books = resultAuthor.books.concat(book.id)
+        await resultAuthor.save()
+        const addedBook = await Book.findById(book.id).populates('author')
       } catch (error) {
         throw new GraphQLError(error.message)
       }
+      pubsub.publish('BOOK_ADDED', { bookAdded: addedBook })
+      return book
     },
     editAuthor: async (root, args) => {
       const author = await Author.findOne({ name: args.name })
