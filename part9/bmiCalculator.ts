@@ -28,7 +28,7 @@ const parseArguments = (args: Array<string>): BmiValues => {
   } else {
     throw new Error('Provided values were not numbers!');
   }
-}
+};
 
 try {
   const { height, weight } = parseArguments(process.argv);

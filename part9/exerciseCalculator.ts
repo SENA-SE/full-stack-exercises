@@ -15,7 +15,7 @@ const calculateExercises = (daily_exercises: number[], target: number): Result =
       target,
       average
     };
-  }
+  };
 
 interface Result {
     periodLength: number;
@@ -46,7 +46,7 @@ const parseExerciseArguments = (args: string[]): ExerciseValues => {
       daily_exercises,
       target
     };
-  }
+  };
 
 try {
   const { daily_exercises, target } = parseExerciseArguments(process.argv);
@@ -56,3 +56,5 @@ try {
 }
 
 // console.log(calculateExercises([3, 0, 2, 4.5, 0, 3, 1], 2))
+
+export default calculateExercises;
