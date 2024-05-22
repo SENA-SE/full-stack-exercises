@@ -7,8 +7,16 @@ router.get('/', (_req, res) => {
     }
 );
 
-router.post('/', (_req, res) => {
-    res.send('Patient added');
+router.post('/', (req, res) => {
+    const patientData = req.body;
+    const newPatient = patientsService.createPatient({
+        name: patientData.name,
+        dateOfBirth: patientData.dateOfBirth,
+        ssn: patientData.ssn,
+        gender:patientData.gender,
+        occupation: patientData.occupation
+    });
+    res.json(newPatient);
 }
 );
 
