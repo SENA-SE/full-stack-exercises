@@ -3,6 +3,8 @@ import { useParams } from "react-router-dom";
 import { Container } from "@mui/material";
 import FemaleIcon from '@mui/icons-material/Female';
 import MaleIcon from '@mui/icons-material/Male';
+import { ReactElement, JSXElementConstructor, ReactNode, ReactPortal, Key } from 'react';
+
 
 interface PatientDataProps {
     patients: Patient[];
@@ -17,7 +19,7 @@ const genderIcon = (gender: Gender) => {
         default:
             return null;
     }
-}
+};
 
 const PatientData = ({patients}: PatientDataProps) => {
     const { id } = useParams<{ id: string }>();
@@ -32,19 +34,18 @@ const PatientData = ({patients}: PatientDataProps) => {
             </h2>
             <p>ssn: {patient.ssn}</p>
             <p>occupation: {patient.occupation}</p>
-            {/* <h3>entries</h3>
-            <ul>
-                {patient.entries.map((entry: Entry) => (
-                    <li key={entry.id}>
-                        {entry.date} {entry.description}
-                        <ul>
-                            {entry.diagnosisCodes?.map((code: string) => (
-                                <li key={code}>{code}</li>
-                            ))}
-                        </ul>
-                    </li>
-                ))}
-            </ul> */}
+            <h3>entries</h3>
+            {patient.entries.map((entry: Entry) => (
+                <div key={entry.id}>
+                    <p>{entry.date} <i>{entry.description}</i></p>
+                    <ul>
+                        {entry.diagnosisCodes?.map((code: string | number | boolean | ReactElement<unknown, string | JSXElementConstructor<unknown>> | Iterable<ReactNode> | ReactPortal | null | undefined, index: Key | null | undefined) => (
+                            <li key={index}>{code}</li>
+                        ))}
+                    </ul>
+                </div>
+            ))}
+
         </Container>
     );
 };
