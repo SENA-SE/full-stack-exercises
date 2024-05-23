@@ -11,6 +11,7 @@ export interface Patient {
     gender: Gender;
     occupation: string;
     ssn: string;
+    entries: Entry[];
 }
 
 export interface PatientWithoutSSN {
@@ -19,6 +20,7 @@ export interface PatientWithoutSSN {
     dateOfBirth: string;
     gender: Gender;
     occupation: string;
+    entries: Entry[];
 }
 
 export type NewPatient = Omit<Patient, 'id'>;
@@ -28,3 +30,24 @@ export enum Gender {
     Female = 'female',
     Other = 'other'
 }
+
+export interface Entry {
+    id: string;
+    date: string;
+    specialist: string;
+    diagnosisCodes?: Array<Diagnose['code']>;
+    description: string;
+    type: string;
+    discharge?: {
+        date: string;
+        criteria: string;
+    };
+    sickLeave?: {
+        startDate: string;
+        endDate: string;
+    };
+    healthCheckRating?: number;
+    employerName?: string;
+}
+
+export type PublicPatient = Omit<Patient, 'ssn' | 'entries'>;
